@@ -1,1 +1,52 @@
-write('this is fucking bad');
+// bad language demo — variables, loops, if/else, arithmetic, input
+
+// --- basic variables and arithmetic ---
+let x = 10;
+let y = 7;
+let sum = x + y;
+let diff = x - y;
+let prod = x * y;
+
+write('--- Arithmetic ---');
+write(sum);
+write(diff);
+write(prod);
+
+// --- if / else ---
+write('--- If/Else ---');
+if (x > y) {
+    write('x is greater');
+} else {
+    write('y is greater or equal');
+}
+
+// --- while loop: count 1 to 5 ---
+write('--- Count 1 to 5 ---');
+let i = 1;
+while (i <= 5) {
+    write(i);
+    i = i + 1;
+}
+
+// --- fibonacci first 8 numbers ---
+write('--- Fibonacci ---');
+let a = 0;
+let b = 1;
+let count = 0;
+while (count < 8) {
+    write(a);
+    let tmp = a + b;
+    a = b;
+    b = tmp;
+    count = count + 1;
+}
+
+// --- modulo / divisibility ---
+write('--- Even numbers 2..10 ---');
+let n = 2;
+while (n <= 10) {
+    if (n % 2 == 0) {
+        write(n);
+    }
+    n = n + 1;
+}
