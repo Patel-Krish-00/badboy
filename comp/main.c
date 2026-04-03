@@ -3,34 +3,24 @@
 #include "bad.h"
 #include "ast.h"
 
-char* read_file(const char* filename) {
+static char* read_file(const char* filename) {
     FILE *file = fopen(filename, "r");
-
     if (!file) {
-        printf("Error: Could not open file\n");
+        fprintf(stderr, "Error: Could not open file '%s'\n", filename);
         exit(1);
     }
-
     fseek(file, 0, SEEK_END);
     long size = ftell(file);
     rewind(file);
-
     char *buffer = malloc(size + 1);
-
-    if (!buffer) {
-        printf("Memory allocation failed\n");
-        exit(1);
-    }
-
+    if (!buffer) { fprintf(stderr, "Memory allocation failed\n"); exit(1); }
     fread(buffer, 1, size, file);
     buffer[size] = '\0';
-
     fclose(file);
     return buffer;
 }
 
 int main(int argc, char *argv[]) {
-
     if (argc < 2) {
         printf("Usage: ./bad <file.bad>\n");
         return 1;
@@ -39,33 +29,24 @@ int main(int argc, char *argv[]) {
     char *source = read_file(argv[1]);
 
     init_lexer(source);
-
     ASTNode* root = parse();
 
-    // 🔥 Generate assembly
+    /* Generate x86_64 Linux assembly directly — no gcc/clang as C compiler */
     generate_asm(root, "out.s");
-
     printf("Generated assembly: out.s\n");
 
-    // 🔥 Compile assembly → executable
-    int compile_status = system("clang out.s -o out");
-
-    if (compile_status != 0) {
-        printf("Assembly compilation failed\n");
+    /* Assemble and link (clang used only as assembler/linker, not as C compiler) */
+    int status = system("clang -nostdlib out.s -o out");
+    if (status != 0) {
+        fprintf(stderr, "Assembly failed\n");
+        free(source);
         return 1;
     }
 
     printf("Running output:\n");
+    int run = system("./out");
+    if (run != 0) fprintf(stderr, "Execution failed\n");
 
-    // 🔥 Run executable
-    int run_status = system("./out");
-
-    if (run_status != 0) {
-        printf("Execution failed\n");
-    }
-
-    free(root);   // free AST
-    free(source); // free file buffer
-
+    free(source);
     return 0;
 }
