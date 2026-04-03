@@ -32,10 +32,12 @@ int main(int argc, char *argv[]) {
     ASTNode* root = parse();
 
     int status = 0;
+    const char *artifact = NULL;
 #if defined(__linux__) && defined(__x86_64__)
     /* Generate x86_64 Linux assembly directly — no gcc/clang as C compiler */
     generate_asm(root, "out.s");
     printf("Generated assembly: out.s\n");
+    artifact = "out.s";
 
     /* Assemble and link (clang used only as assembler/linker, not as C compiler) */
     status = system("clang -nostdlib out.s -o out");
@@ -43,10 +45,12 @@ int main(int argc, char *argv[]) {
     /* Fallback for non-Linux/x86_64 hosts: emit portable C and compile it */
     generate_c(root, "out.c");
     printf("Generated C: out.c\n");
+    artifact = "out.c";
     status = system("clang out.c -o out");
 #endif
     if (status != 0) {
-        fprintf(stderr, "Compilation failed\n");
+        fprintf(stderr, "Compilation failed (status=%d). Check generated file: %s\n",
+                status, artifact ? artifact : "(unknown)");
         free(source);
         return 1;
     }
