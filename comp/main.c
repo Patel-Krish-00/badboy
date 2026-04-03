@@ -33,11 +33,13 @@ int main(int argc, char *argv[]) {
 
     int status = 0;
     const char *artifact = NULL;
+    const char *stage = "Compilation";
 #if defined(__linux__) && defined(__x86_64__)
     /* Generate x86_64 Linux assembly directly — no gcc/clang as C compiler */
     generate_asm(root, "out.s");
     printf("Generated assembly: out.s\n");
     artifact = "out.s";
+    stage = "Assembly";
 
     /* Assemble and link (clang used only as assembler/linker, not as C compiler) */
     status = system("clang -nostdlib out.s -o out");
@@ -46,11 +48,12 @@ int main(int argc, char *argv[]) {
     generate_c(root, "out.c");
     printf("Generated C: out.c\n");
     artifact = "out.c";
+    stage = "C compilation";
     status = system("clang out.c -o out");
 #endif
     if (status != 0) {
-        fprintf(stderr, "Compilation failed (status=%d). Check generated file: %s\n",
-                status, artifact ? artifact : "(unknown)");
+        fprintf(stderr, "%s failed (status=%d). Generated artifact: %s\n",
+                stage, status, artifact ? artifact : "(unknown)");
         free(source);
         return 1;
     }
