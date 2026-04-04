@@ -1,0 +1,25 @@
+write('BAD compiler demo');
+let a = 10;
+let b = 3;
+let c = 0;
+
+write(a + b);
+write(a * b);
+write(a - b);
+write(a / b);
+write(a % b);
+if (a > b) {
+    write('a is greater');
+} else {
+    write('b is greater');
+}
+
+while (b > 0) {
+    write(b);
+    b = b - 1;
+}
+if (a<b) {
+    write('a is less');
+}
+
+write('this is fucking it');

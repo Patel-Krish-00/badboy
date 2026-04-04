@@ -1,0 +1,27 @@
+// Declare
+let x = 42;
+
+// Assign
+x = x + 1;
+
+// Read integer into variable
+write('Enter an integer for x:');
+read(x);
+
+// Print int or string
+write('You entered:');
+write(x);
+write('hello');
+
+// If / else
+if (x >= 10) {
+    write('big');
+} else {
+    write('small');
+}
+
+// While
+while (x > 0) {
+    write(x);
+    x = x - 1;
+}
