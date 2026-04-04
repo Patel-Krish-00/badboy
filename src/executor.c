@@ -20,6 +20,10 @@ static void set_var(const char *name, long long val) {
     for (int i = 0; i < exec_num_vars; i++) {
         if (strcmp(exec_vars[i].name, name) == 0) { exec_vars[i].value = val; return; }
     }
+    if (exec_num_vars >= MAX_VARS) {
+        fprintf(stderr, "Too many variables in executor\n");
+        exit(1);
+    }
     strncpy(exec_vars[exec_num_vars].name, name, 63);
     exec_vars[exec_num_vars].name[63] = '\0';
     exec_vars[exec_num_vars].value = val;

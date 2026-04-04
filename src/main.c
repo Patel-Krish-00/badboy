@@ -16,12 +16,31 @@ static char* read_file(const char* filename) {
         fprintf(stderr, "Error: Could not open file '%s'\n", filename);
         exit(1);
     }
-    fseek(file, 0, SEEK_END);
+    if (fseek(file, 0, SEEK_END) != 0) {
+        fprintf(stderr, "Error: Could not seek file '%s'\n", filename);
+        fclose(file);
+        exit(1);
+    }
     long size = ftell(file);
+    if (size < 0) {
+        fprintf(stderr, "Error: Could not determine size of '%s'\n", filename);
+        fclose(file);
+        exit(1);
+    }
     rewind(file);
     char *buffer = malloc(size + 1);
-    if (!buffer) { fprintf(stderr, "Memory allocation failed\n"); exit(1); }
-    fread(buffer, 1, size, file);
+    if (!buffer) {
+        fprintf(stderr, "Memory allocation failed\n");
+        fclose(file);
+        exit(1);
+    }
+    size_t read_bytes = fread(buffer, 1, (size_t)size, file);
+    if (read_bytes != (size_t)size) {
+        fprintf(stderr, "Error: Failed while reading '%s'\n", filename);
+        free(buffer);
+        fclose(file);
+        exit(1);
+    }
     buffer[size] = '\0';
     fclose(file);
     return buffer;

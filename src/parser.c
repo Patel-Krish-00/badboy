@@ -10,6 +10,10 @@ static void parser_advance() { cur = get_next_token(); }
 
 static ASTNode* new_node(ASTNodeType type) {
     ASTNode* n = calloc(1, sizeof(ASTNode));
+    if (!n) {
+        fprintf(stderr, "Out of memory while creating AST node\n");
+        exit(1);
+    }
     n->type = type;
     return n;
 }

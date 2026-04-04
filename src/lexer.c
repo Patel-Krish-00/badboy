@@ -1,10 +1,18 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
 #include "bad.h"
 
+#define TOKEN_VALUE_CAP 255
+
 static const char *input;
 static int pos;
+
+static void lexer_fatal(const char *msg) {
+    fprintf(stderr, "Lex error at position %d: %s\n", pos, msg);
+    exit(1);
+}
 
 void init_lexer(const char *src) {
     input = src;
@@ -32,6 +40,9 @@ static Token read_string() {
     advance(); /* skip opening ' */
     int i = 0;
     while (current_char() != '\'' && current_char() != '\0') {
+        if (i >= TOKEN_VALUE_CAP) {
+            lexer_fatal("string literal too long");
+        }
         if (current_char() == '\\') {
             advance();
             switch (current_char()) {
@@ -56,6 +67,9 @@ static Token read_number() {
     tok.type = TOKEN_INT;
     int i = 0;
     while (isdigit((unsigned char)current_char())) {
+        if (i >= TOKEN_VALUE_CAP) {
+            lexer_fatal("integer literal too long");
+        }
         tok.value[i++] = current_char();
         advance();
     }
@@ -68,11 +82,15 @@ static Token read_identifier() {
     char buf[256];
     int i = 0;
     while (isalnum((unsigned char)current_char()) || current_char() == '_') {
+        if (i >= TOKEN_VALUE_CAP) {
+            lexer_fatal("identifier too long");
+        }
         buf[i++] = current_char();
         advance();
     }
     buf[i] = '\0';
-    strcpy(tok.value, buf);
+    strncpy(tok.value, buf, TOKEN_VALUE_CAP);
+    tok.value[TOKEN_VALUE_CAP] = '\0';
 
     if      (strcmp(buf, "write") == 0) tok.type = TOKEN_WRITE;
     else if (strcmp(buf, "let")   == 0) tok.type = TOKEN_LET;
